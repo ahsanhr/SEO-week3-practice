@@ -58,7 +58,7 @@ def webhook():
     if request.method == 'POST':
         payload = request.json
         # Optional: Only deploy if the push is to the main branch
-        if payload.get('ref') == 'refs/heads/main':
+        if payload.get('ref') == 'refs/heads/master':
             # Run the bash script we created in Step 1
             script_path = '/home/SEOweek3practice/SEO-week3-practice/post-merge.sh'
             subprocess.Popen([script_path])
