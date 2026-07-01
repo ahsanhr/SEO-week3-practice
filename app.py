@@ -1,7 +1,9 @@
 # from flask_debugtoolbar import DebugToolbarExtension
-from flask import Flask
+from flask import Flask, render_template, url_for, flash, redirect, request
 import os
 from dotenv import load_dotenv
+import git
+
 
 
 load_dotenv()
@@ -17,6 +19,16 @@ app.debug = True
 @app.route("/")                          # this tells you the URL the method below is related to
 def hello_world():
     return "<p>Hello, World!</p>"        # this prints HTML to the webpage
+
+@app.route("/update_server", methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('/home/SEOweek3practice/SEO-week3-practice')
+        origin = repo.remotes.origin
+        origin.pull()
+        return 'Updated PythonAnywhere successfully', 200
+    else:
+        return 'Wrong event type', 400
   
 if __name__ == '__main__':               # this should always be at the end
     app.run(debug=True, host="0.0.0.0")
