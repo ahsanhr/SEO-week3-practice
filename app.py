@@ -31,6 +31,45 @@ class User(db.Model):
 with app.app_context():
   db.create_all()
 
+# this is from gemini, to set up the webhook
+GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
+
+def is_valid_signature(x_hub_signature, data, private_key):
+    """Verify that the payload matches the GitHub signature"""
+    hash_algorithm, github_signature = x_hub_signature.split('=', 1)
+    if hash_algorithm != 'sha256':
+        return False
+    
+    algorithm = hashlib.sha256
+    mac = hmac.new(private_key.encode('utf-8'), msg=data, digestmod=algorithm)
+    return hmac.compare_digest(mac.hexdigest(), github_signature)
+
+@app.route('/update_server', methods=['POST'])
+def webhook():
+    # 1. Validate the signature from GitHub
+    x_hub_signature = request.headers.get('X-Hub-Signature-256')
+    if not x_hub_signature:
+        abort(400, "Missing signature")
+        
+    if not is_valid_signature(x_hub_signature, request.data, GITHUB_WEBHOOK_SECRET):
+        abort(403, "Invalid signature")
+
+    # 2. If valid, execute the deployment script
+    if request.method == 'POST':
+        payload = request.json
+        # Optional: Only deploy if the push is to the main branch
+        if payload.get('ref') == 'refs/heads/main':
+            # Run the bash script we created in Step 1
+            script_path = '/home/SEOweek3practice/SEO-week3-practice/post-merge.sh'
+            subprocess.Popen([script_path])
+            return 'Update initialized successfully', 200
+        else:
+            return 'Push event ignored (not main branch)', 200
+    else:
+        abort(400)
+
+# gemini help end
+
 
 @app.route("/")                          # this tells you the URL the method below is related to
 @app.route("/home")
@@ -54,16 +93,6 @@ def register():
         flash(f'Account created for {form.username.data}!', 'success')
         return redirect(url_for('home')) # if so - send to home page
     return render_template('register.html', title='Register', form=form)
-
-@app.route("/update_server", methods=['POST'])
-def webhook():
-    if request.method == 'POST':
-        repo = git.Repo('/home/SEOweek3practice/SEO-week3-practice')
-        origin = repo.remotes.origin
-        origin.pull()
-        return 'Updated PythonAnywhere successfully', 200
-    else:
-        return 'Wrong event type', 400
   
 if __name__ == '__main__':               # this should always be at the end
     app.run(debug=True, host="0.0.0.0")
