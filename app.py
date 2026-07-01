@@ -1,11 +1,14 @@
 # from flask_debugtoolbar import DebugToolbarExtension              # this doesnt work 
-from flask import Flask, render_template, url_for, flash, redirect, request
+from flask import Flask, render_template, url_for, flash, redirect, request, abort
 import os
 from dotenv import load_dotenv
 import git
 from flask_sqlalchemy import SQLAlchemy
 from forms import RegistrationForm
 from flask_behind_proxy import FlaskBehindProxy
+import subprocess
+import hmac
+import hashlib
 
 load_dotenv()
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
