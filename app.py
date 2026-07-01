@@ -35,27 +35,27 @@ with app.app_context():
   db.create_all()
 
 # this is from gemini, to set up the webhook
-GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
+# GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
 
-def is_valid_signature(x_hub_signature, data, private_key):
-    """Verify that the payload matches the GitHub signature"""
-    hash_algorithm, github_signature = x_hub_signature.split('=', 1)
-    if hash_algorithm != 'sha256':
-        return False
+# def is_valid_signature(x_hub_signature, data, private_key):
+#     """Verify that the payload matches the GitHub signature"""
+#     hash_algorithm, github_signature = x_hub_signature.split('=', 1)
+#     if hash_algorithm != 'sha256':
+#         return False
     
-    algorithm = hashlib.sha256
-    mac = hmac.new(private_key.encode('utf-8'), msg=data, digestmod=algorithm)
-    return hmac.compare_digest(mac.hexdigest(), github_signature)
+#     algorithm = hashlib.sha256
+#     mac = hmac.new(private_key.encode('utf-8'), msg=data, digestmod=algorithm)
+#     return hmac.compare_digest(mac.hexdigest(), github_signature)
 
 @app.route('/update_server', methods=['POST'])
 def webhook():
-    # 1. Validate the signature from GitHub
-    x_hub_signature = request.headers.get('X-Hub-Signature-256')
-    if not x_hub_signature:
-        abort(400, "Missing signature")
+    # # 1. Validate the signature from GitHub
+    # x_hub_signature = request.headers.get('X-Hub-Signature-256')
+    # if not x_hub_signature:
+    #     abort(400, "Missing signature")
         
-    if not is_valid_signature(x_hub_signature, request.data, GITHUB_WEBHOOK_SECRET):
-        abort(403, "Invalid signature")
+    # if not is_valid_signature(x_hub_signature, request.data, GITHUB_WEBHOOK_SECRET):
+    #     abort(403, "Invalid signature")
 
     # 2. If valid, execute the deployment script
     if request.method == 'POST':
