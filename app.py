@@ -34,7 +34,8 @@ class User(db.Model):
 with app.app_context():
   db.create_all()
 
-# this is from gemini, to set up the webhook
+# this is from gemini, to set up the webhook and to validate the token. 
+# its not working though so i just kept the parts from the codio and from gemini that matched up 
 # GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
 
 # def is_valid_signature(x_hub_signature, data, private_key):
@@ -80,7 +81,7 @@ def home():
     return render_template('home.html', subtitle='Home Page', text='This is the home page')
 
 # def hello_world():
-#     return "<p>Hello, World But this time with a webhook again again</p>"        # this prints HTML to the webpage
+#     return "<p>Hello, World But this time with a webhook again again</p>"        # this prints HTML to the webpage, the "hello world"
 
 @app.route("/second_page")
 def second_page():
