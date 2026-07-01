@@ -1,4 +1,4 @@
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask
 import os
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ app = Flask(__name__)                    # this gets the name of the file so Fla
 # proxied = FlaskBehindProxy(app)
 app.config['SECRET_KEY'] = FLASK_SECRET_KEY
 app.debug = True
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 @app.route("/")                          # this tells you the URL the method below is related to
 def hello_world():
