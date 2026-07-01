@@ -48,6 +48,6 @@ Thumbs.db
 .flaskenv
 instance/
 
-# Local databases (if using SQLite)
+# Local databases
 *.sqlite3
 *.db

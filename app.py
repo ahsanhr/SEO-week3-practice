@@ -9,8 +9,12 @@ from flask_behind_proxy import FlaskBehindProxy
 import subprocess
 import hmac
 import hashlib
+from pathlib import Path
 
-load_dotenv()
+
+base_dir = Path(__file__).resolve().parent
+env_path = base_dir / '.env'
+load_dotenv(dotenv_path=env_path)
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 
 app = Flask(__name__)                    # this gets the name of the file so Flask knows it's name
@@ -86,6 +90,7 @@ def home():
 @app.route("/second_page")
 def second_page():
     return render_template('second_page.html', subtitle='Second Page', text='This is the second page')
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
