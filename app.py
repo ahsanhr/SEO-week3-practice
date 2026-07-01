@@ -1,24 +1,51 @@
-# from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension              # this doesnt work 
 from flask import Flask, render_template, url_for, flash, redirect, request
 import os
 from dotenv import load_dotenv
 import git
-
-
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
+
+class User(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  username = db.Column(db.String(20), unique=True, nullable=False)
+  email = db.Column(db.String(120), unique=True, nullable=False)
+  password = db.Column(db.String(60), nullable=False)
+
+  def __repr__(self):
+    return f"User('{self.username}', '{self.email}')"
+
+with app.app_context():
+  db.create_all()
+
 
 app = Flask(__name__)                    # this gets the name of the file so Flask knows it's name
-# proxied = FlaskBehindProxy(app)
+proxied = FlaskBehindProxy(app)
 app.config['SECRET_KEY'] = FLASK_SECRET_KEY
 app.debug = True
-# toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)              #yeah this doesnt work 
 
 @app.route("/")                          # this tells you the URL the method below is related to
-def hello_world():
-    return "<p>Hello, World But this time with a webhook again again</p>"        # this prints HTML to the webpage
+@app.route("/home")
+def home():
+    return render_template('home.html', subtitle='Home Page', text='This is the home page')
+
+# def hello_world():
+#     return "<p>Hello, World But this time with a webhook again again</p>"        # this prints HTML to the webpage
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit(): # checks if entries are valid
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('home')) # if so - send to home page
+    return render_template('register.html', title='Register', form=form)
+
 
 @app.route("/update_server", methods=['POST'])
 def webhook():
